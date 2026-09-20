@@ -1,0 +1,1 @@
+# Security & RBAC\n\nThe agent runs with read-only RBAC privileges. Mutations require human approval.

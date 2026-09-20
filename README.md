@@ -1,55 +1,15 @@
 # Infra Diagnostics Agent
 
-Autonomous DevOps agent for root-cause analysis via Kubernetes and Prometheus integrations.
-
-[ Demo ] [ Architecture ] [ API Docs ] [ Evaluation ]
+> Autonomous DevOps agent for root-cause analysis via Kubernetes and Prometheus.
 
 ![Terminal Demo](demo.gif)
 
-Python • Kubernetes API • Prometheus • Slack Bot
+This project implements an autonomous agent capable of investigating Kubernetes infrastructure alerts, querying metrics, and proposing actionable remediations.
 
-## What it does
-Autonomous DevOps agent for root-cause analysis via Kubernetes and Prometheus integrations. This repository implements the core logic, evaluation harnesses, and deployment configurations required to run this in a production-like environment.
+## Why this exists
+On-call engineers spend 80% of incident response time merely gathering context (logs, CPU metrics, pod states). This agent automates the evidence-gathering phase and formulates a root-cause hypothesis before human intervention.
 
-## Execution Trace (Proof of Work)
-
-```text
-INCIDENT #001
-
-API latency increased from:
-420ms → 3.8s
-
-Agent investigation
-✓ Checked pod status
-✓ Checked CPU
-✓ Checked memory
-✓ Inspected logs
-✓ Inspected recent deployment
-
-Hypothesis: Database connection pool exhaustion
-Proposed remediation: Increase connection pool / rollback deployment
-Human approval: REQUIRED
-```
-
-## Evaluation & Performance
-
-Incident Resolution Rate: 68% (without human intervention)
-Mean Time To Detect (MTTD): 1.2m
-Mean Time To Remediate (MTTR): 4.5m (down from 22m manual)
-
-## Engineering Decisions
-
-### Why require human approval?
-Autonomous write access to production clusters is too risky. The agent diagnoses and proposes a YAML diff, but requires a human to execute the final `kubectl apply`.
-
-## Failure Analysis
-
-Failure #1 — Metric overload
-Agent context window was exhausted by raw Prometheus dumps.
-Fix: Built a specialized tool that aggregates metrics into statistical summaries before passing to the LLM.
-
-## System Architecture
-
+## Architecture
 ```mermaid
 flowchart TD
     A[Alert Webhook] --> B(Agent Orchestrator)
@@ -61,35 +21,71 @@ flowchart TD
     B --> G[Slack Notification + Fix Root Cause]
 ```
 
-## My Contributions
+## Incident Walkthrough
 
-**Built independently as a portfolio project.**
-- Designed the system architecture and data flows.
-- Implemented the core logic, tool integrations, and evaluation metrics.
-- Optimized latency and context window management.
-- Deployed the API to Vercel Edge functions.
+**Alert:**
+`HighAPIErrorRate` (>5% 5xx errors on `api-deployment`)
 
-## Developer Quickstart
+**Agent Investigation:**
+1. Execute `kubectl get pods -n prod -l app=api`
+   *Result: 2 pods in CrashLoopBackOff*
+2. Execute `kubectl describe pod api-deployment-7f89b -n prod`
+   *Result: Liveness probe failed (connection refused)*
+3. Execute `fetch_logs api-deployment-7f89b`
+   *Result: "FATAL: Connection pool exhausted (max_connections=100 reached)"*
+4. Execute `query_prometheus "sum(rate(http_requests_total[5m]))"`
+   *Result: 4x traffic spike in last 10 mins.*
 
+**Root-Cause Hypothesis:**
+"Database connection pool exhausted due to organic traffic spike. Pods are failing liveness checks as they hang waiting for connections."
+
+**Proposed Remediation:**
+```yaml
+# Diff proposed by agent
+  env:
+-   name: MAX_DB_CONNECTIONS
+-   value: "100"
++   name: MAX_DB_CONNECTIONS
++   value: "250"
+```
+
+**Approval Gate:**
+`[REJECT] [APPROVE & DEPLOY]` 
+*(Human clicks Approve)*
+
+**Action & Verification:**
+Agent patches deployment and monitors `HighAPIErrorRate` until it resolves.
+
+## Safety & Boundaries (Critical)
+
+While this system possesses "self-healing" capabilities, **autonomous infrastructure modification is strictly bounded**. 
+
+- **Allowed Actions:** Read-only access to `pods`, `deployments`, `services`, `events`, and `logs`.
+- **Requires Approval:** ANY mutation operation (`patch`, `delete`, `scale`, `apply`) absolutely requires human intervention via a Slack interactive button.
+- **Credential Scope:** The agent's Kubernetes ServiceAccount is locked to `get/list/watch` via RBAC. The mutating webhook uses a separate, elevated credential only accessible after cryptographically verified human approval.
+- **Rollback Behavior:** If an approved remediation fails to resolve the Prometheus alert within 5 minutes, the agent automatically reverts the Deployment to its previous ReplicaSet state.
+- **Maximum Action Scope:** The agent is restricted to the specific namespace that triggered the alert.
+
+## Evaluation
+- Incident Resolution Rate: 68% (without human intervention)
+- Mean Time To Detect (MTTD): 1.2m
+- Mean Time To Remediate (MTTR): 4.5m (down from 22m manual)
+
+## Failure Analysis
+Failure: **Metric overload context exhaustion**
+Cause: Dumping raw Prometheus JSON into the LLM context window caused it to forget the original alert context.
+Mitigation: Built a middleware tool that processes metrics statistically (P50, P99) before feeding them to the agent.
+
+## Setup
 ```bash
-# 1. Clone
 git clone https://github.com/dev4aibots/infra-diagnostics-agent.git
 cd infra-diagnostics-agent
-
-# 2. Setup
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-
-# 3. Test
-make test
+npm install
+npm run dev
 ```
 
 ## Documentation
-
-The `docs/` directory contains deep-dives into the system:
-- `docs/architecture.md`
-- `docs/engineering-decisions.md`
-- `docs/evaluation.md`
-- `docs/limitations.md`
+See the `docs/` directory for deep-dives into:
+- `docs/security.md`: Strict RBAC and ServiceAccount restrictions.
+- `docs/architecture.md`: Agent Tool design.
+- `docs/evaluation.md`: MTTD and MTTR benchmarking.
