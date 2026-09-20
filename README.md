@@ -2,7 +2,9 @@
 
 > Autonomous DevOps agent for root-cause analysis via Kubernetes and Prometheus.
 
-[Demo](#) | [Architecture](docs/architecture.md) | [API Docs](#) | [Evaluation](#evaluation--performance)
+![Demo](demo.gif)
+
+[Demo](demo.gif) | [Architecture](docs/architecture.md) | [API Docs](#) | [Evaluation](#evaluation--performance)
 
 ## What it does
 An autonomous agent that investigates Kubernetes infrastructure alerts, queries metrics, and formulates a root-cause hypothesis before human intervention.
