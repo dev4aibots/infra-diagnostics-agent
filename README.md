@@ -1,5 +1,7 @@
 # Infrastructure Diagnostics Agent
 
+![Terminal Demo](demo.gif)
+
 An autonomous Python agent that hooks into infrastructure to diagnose and fix operational issues.
 
 ## Tech Stack
@@ -27,6 +29,8 @@ This project is deployed as a serverless backend on Vercel. You can test the API
 
 ```bash
 # Example Request
+
+![Terminal Demo](demo.gif)
 curl -X GET https://infra-diagnostics-agent-j2f4f552o-dev4aibots.vercel.app/api/health
 ```
 
