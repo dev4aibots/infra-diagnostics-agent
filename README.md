@@ -8,12 +8,12 @@
 
 > **An autonomous Python agent that hooks into Kubernetes and Prometheus infrastructure to diagnose and fix complex operational issues.**
 
-## 🌟 Key Features
-- ✅ **Automated root-cause analysis for microservices**
-- ✅ **Integration with standard DevOps telemetry**
-- ✅ **Self-healing incident response capabilities**
+## Key Features
+- **Automated root-cause analysis for microservices**
+- **Integration with standard DevOps telemetry**
+- **Self-healing incident response capabilities**
 
-## 🏗️ Architecture
+## Architecture
 
 ```mermaid
 flowchart TD
@@ -26,7 +26,7 @@ flowchart TD
     B --> G[Slack Notification + Fix Root Cause]
 ```
 
-## 🚀 Live API Endpoint (Vercel)
+## Live API Endpoint (Vercel)
 
 This project is deployed serverless via Vercel Edge Functions. You can test the interaction directly from your terminal.
 
@@ -35,7 +35,7 @@ This project is deployed serverless via Vercel Edge Functions. You can test the 
 curl -X GET https://infra-diagnostics-agent-j2f4f552o-dev4aibots.vercel.app/api/health
 ```
 
-## 💻 Developer Quickstart
+## Developer Quickstart
 
 ### Prerequisites
 - Python 3.11+
@@ -67,7 +67,7 @@ curl -X GET https://infra-diagnostics-agent-j2f4f552o-dev4aibots.vercel.app/api/
    npm run dev
    ```
 
-## 📁 Project Structure
+## Project Structure
 ```
 .
 ├── api/                  # Vercel serverless endpoints
@@ -78,5 +78,5 @@ curl -X GET https://infra-diagnostics-agent-j2f4f552o-dev4aibots.vercel.app/api/
 └── vercel.json           # Vercel routing configuration
 ```
 
-## 📄 License
+## License
 This project is licensed under the MIT License.
