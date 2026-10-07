@@ -1,5 +1,9 @@
 # Infra Diagnostics Agent
 
+> 🧪 **Learning build** — a course/tutorial project for studying DevOps diagnostic agents. Not a production system.
+
+> **Status:** Reference / learning code. The scaffold runs locally for experimentation; it is not deployed, has no production users, and has not been hardened for production use.
+
 > Autonomous DevOps agent for root-cause analysis via Kubernetes and Prometheus.
 
 ![Demo](demo.gif)
