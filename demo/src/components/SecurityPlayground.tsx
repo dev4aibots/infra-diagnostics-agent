@@ -79,9 +79,9 @@ const useStyles = makeStyles({
 });
 
 const SCENARIOS: { mode: ProbeMode; label: string; hint: string }[] = [
-  { mode: "valid", label: "Valid signature", hint: "Fresh timestamp, correct HMAC → 200" },
-  { mode: "tampered", label: "Tampered signature", hint: "Digest altered → 401 mismatch" },
-  { mode: "stale", label: "Stale timestamp", hint: "Older than 300s → 401 stale" },
+  { mode: "valid", label: "Valid request", hint: "Fresh signature, sent on time, accepted" },
+  { mode: "tampered", label: "Tampered request", hint: "Signature altered, rejected" },
+  { mode: "stale", label: "Old request", hint: "Older than 5 minutes, rejected as a replay" },
 ];
 
 export function SecurityPlayground() {
@@ -104,13 +104,13 @@ export function SecurityPlayground() {
 
   return (
     <div>
-      <h2 className={styles.title}>Signature playground</h2>
+      <h2 className={styles.title}>Request security check</h2>
       <div className={styles.section}>
         <MessageBar intent="info">
           <MessageBarBody>
-            Every request is verified with Slack&apos;s signing scheme: <b>HMAC-SHA256</b> over
-            <b> v0:timestamp:body</b>, compared in constant time, with a <b>300&nbsp;s</b> replay
-            window. These probes drive the real verification code — nothing is stubbed.
+            Incoming requests are checked the way Slack checks theirs: each request carries a
+            signature made with a shared secret, compared in constant time, with a 5-minute
+            window to block replays. These probes run the real verification code, nothing is faked.
           </MessageBarBody>
         </MessageBar>
         <div className={styles.row}>
@@ -135,15 +135,15 @@ export function SecurityPlayground() {
               HTTP {result.status}
             </Badge>
             <span className={styles.headTitle}>
-              {result.mode === "valid" && "Valid request — accepted"}
-              {result.mode === "tampered" && "Tampered request — rejected"}
-              {result.mode === "stale" && "Stale request — rejected"}
+              {result.mode === "valid" && "Accepted: valid request"}
+              {result.mode === "tampered" && "Rejected: tampered request"}
+              {result.mode === "stale" && "Rejected: old request"}
             </span>
           </div>
           <div className={styles.section}>
             <div>
               <div className={styles.key} style={{ marginBottom: tokens.spacingVerticalS }}>
-                Handler response body
+                What the server returned
               </div>
               <pre className={styles.pre} style={{ fontFamily: theme.fontFamilyMonospace }}>
                 {JSON.stringify(result.body, null, 2)}
@@ -152,7 +152,7 @@ export function SecurityPlayground() {
             <div className={styles.kv} style={{ fontFamily: theme.fontFamilyMonospace }}>
               <span className={styles.key}>timestamp</span>
               <span className={styles.value}>{result.request.timestamp}</span>
-              <span className={styles.key}>base string</span>
+              <span className={styles.key}>signed content</span>
               <span className={styles.value}>{result.request.baseString}</span>
               <span className={styles.key}>signature</span>
               <span className={styles.value}>{result.request.signature}</span>
