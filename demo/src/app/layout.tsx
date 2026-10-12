@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Sentinel — Infra Diagnostics Console",
+  title: "Sentinel — infra diagnostics console",
   description:
-    "Simulated Microsoft Fluent console for the infra-diagnostics-agent: alert triage, approval gates, and Slack signature verification. No real cluster, no credentials.",
+    "A simulated on-call console: paste an infrastructure alert, read the agent's ranked likely causes with evidence, and approve a fix before anything runs. No real cluster, no credentials.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
