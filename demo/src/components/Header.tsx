@@ -97,7 +97,7 @@ export function Header() {
         </span>
         <div className={styles.wordmarkWrap}>
           <ShinyWordmark text="Sentinel" />
-          <span className={styles.subtitle}>Infra diagnostics console</span>
+          <span className={styles.subtitle}>Simulated on-call console</span>
         </div>
       </div>
       <div className={styles.spacer}>
