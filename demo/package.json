@@ -9,11 +9,9 @@
   },
   "description": "Sentinel console — Microsoft Fluent demo surface for the infra-diagnostics-agent (simulated, zero credentials).",
   "devDependencies": {
-    "@siluat/color-contrast-cli": "^1.0.1",
     "@types/node": "20.19.43",
     "@types/react": "18.3.31",
     "@types/react-dom": "18.3.7",
-    "stylelint": "^16.26.1",
     "typescript": "5.9.3"
   },
   "name": "sentinel-console",
