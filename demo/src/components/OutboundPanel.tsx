@@ -79,7 +79,7 @@ export function OutboundPanel() {
 
   return (
     <div>
-      <h2 className={styles.title}>Outbound log &amp; health</h2>
+      <h2 className={styles.title}>Sent messages &amp; service health</h2>
       <div className={styles.section}>
         <div className={styles.row}>
           {loading || !health ? (
@@ -95,20 +95,22 @@ export function OutboundPanel() {
             </MessageBar>
           )}
           <Button appearance="secondary" onClick={() => void refresh()}>
-            Refresh
+            Refresh now
           </Button>
         </div>
         <MessageBar intent="info">
           <MessageBarBody>
-            Entries are the simulated Slack posts the ported handlers append to the in-memory
-            outbound log (e.g. decision replies). They are never sent anywhere — this panel only
-            reads them back. Approve, Escalate, or Ignore a hypothesis to add one.
+            These are the messages the agent would send, like decision replies. They are
+            written to a local log only and never leave this page. Approve, escalate, or
+            dismiss a proposed fix to add one.
           </MessageBarBody>
         </MessageBar>
       </div>
 
       {entries.length === 0 ? (
-        <span className={styles.caption}>No outbound calls recorded yet.</span>
+        <span className={styles.caption}>
+          No messages yet. Make a decision on a proposed fix and it will appear here.
+        </span>
       ) : (
         <Table>
           <TableHeader>
