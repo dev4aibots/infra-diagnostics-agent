@@ -23,6 +23,17 @@ export const ThemeContext = React.createContext<{
 // FluentProvider is client-only; Griffel styles are extracted on the server
 // via useServerInsertedHTML per the react.fluentui.dev App Router recipe.
 // <body> background is set manually — FluentProvider does not theme it.
+//
+// Type voice (§7 direction): the authentic Fluent stack, Segoe UI Variable
+// first, Segoe UI fallback, system-ui last. Defined once on the theme object
+// so every component still reads tokens.fontFamilyBase (no raw font values
+// in styles). On machines without Segoe UI Variable it degrades gracefully.
+const FONT_STACK =
+  "'Segoe UI Variable Text', 'Segoe UI Variable Display', 'Segoe UI', system-ui, " +
+  "-apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif";
+const MONO_STACK =
+  "'Cascadia Code', 'Cascadia Mono', Consolas, 'Courier New', monospace";
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [renderer] = React.useState(() => createDOMRenderer());
   const [dark, setDark] = React.useState(false);
@@ -37,7 +48,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return () => mq.removeEventListener("change", onChange);
   }, []);
 
-  const theme: Theme = dark ? webDarkTheme : webLightTheme;
+  const theme: Theme = React.useMemo(() => {
+    const base = dark ? webDarkTheme : webLightTheme;
+    return { ...base, fontFamilyBase: FONT_STACK, fontFamilyMonospace: MONO_STACK };
+  }, [dark]);
 
   React.useEffect(() => {
     // All values below come from the theme object itself — no raw values.
