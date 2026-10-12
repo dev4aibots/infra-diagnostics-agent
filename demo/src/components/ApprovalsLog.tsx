@@ -6,6 +6,7 @@ import {
   Badge,
   MessageBar,
   MessageBarBody,
+  MessageBarTitle,
   Table,
   TableBody,
   TableCell,
@@ -56,12 +57,13 @@ export function ApprovalsLog({ decisions }: { decisions: DecisionRecord[] }) {
 
   return (
     <div>
-      <h2 className={styles.title}>Approval gate — decision log</h2>
+      <h2 className={styles.title}>Your decisions</h2>
       {decisions.length === 0 ? (
         <MessageBar intent="info">
+          <MessageBarTitle>No decisions recorded yet</MessageBarTitle>
           <MessageBarBody>
-            No decisions yet. Triage an alert, then Approve, Escalate, or Ignore a hypothesis —
-            each confirmed decision is recorded here with the agent&apos;s exact reply.
+            Check an alert, then approve, escalate, or dismiss a proposed fix. Each decision
+            lands here with the agent&apos;s exact reply.
           </MessageBarBody>
         </MessageBar>
       ) : (
@@ -70,9 +72,9 @@ export function ApprovalsLog({ decisions }: { decisions: DecisionRecord[] }) {
             <TableRow>
               <TableHeaderCell>Time</TableHeaderCell>
               <TableHeaderCell>Incident</TableHeaderCell>
-              <TableHeaderCell>Action</TableHeaderCell>
+              <TableHeaderCell>Decision</TableHeaderCell>
               <TableHeaderCell>Agent reply</TableHeaderCell>
-              <TableHeaderCell>Remediation plan</TableHeaderCell>
+              <TableHeaderCell>Proposed fix</TableHeaderCell>
             </TableRow>
           </TableHeader>
           <TableBody>
