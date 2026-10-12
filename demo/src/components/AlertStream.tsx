@@ -44,6 +44,8 @@ const useStyles = makeStyles({
     flexDirection: "column",
     gap: tokens.spacingVerticalS,
   },
+  // Live feed choreography (pattern after Magic UI animated-list, MIT):
+  // new alerts slide in on mount, transform/opacity only, token easing.
   item: {
     display: "flex",
     alignItems: "center",
@@ -52,6 +54,13 @@ const useStyles = makeStyles({
     borderRadius: tokens.borderRadiusMedium,
     boxShadow: tokens.shadow2,
     padding: tokens.spacingHorizontalM,
+    animationName: "sentinel-stream-in",
+    animationDuration: tokens.durationSlow,
+    animationTimingFunction: tokens.curveDecelerateMid,
+    animationFillMode: "both",
+    "@media (max-width: 640px)": {
+      flexWrap: "wrap",
+    },
   },
   text: {
     fontSize: tokens.fontSizeBase300,
@@ -66,6 +75,12 @@ const useStyles = makeStyles({
     whiteSpace: "nowrap",
   },
 });
+
+function StreamKeyframes() {
+  return (
+    <style>{`@keyframes sentinel-stream-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } } @media (prefers-reduced-motion: reduce) { .sentinel-stream-item { animation: none !important; } }`}</style>
+  );
+}
 
 export type StreamItem = { id: number; at: string; text: string };
 
@@ -94,38 +109,39 @@ export function AlertStream({ onTriageText }: { onTriageText: (text: string) => 
 
   return (
     <div>
-      <h2 className={styles.title}>Simulated alert stream</h2>
+      <StreamKeyframes />
+      <h2 className={styles.title}>Alert stream</h2>
       <div className={styles.section}>
         <MessageBar intent="info">
           <MessageBarBody>
-            A timer feeds sample alerts every few seconds so you can watch triage end to end.
-            Every item is labeled <b>SIMULATED</b> — there is no live cluster behind this console.
+            Sample alerts arrive every few seconds so you can watch the full flow. Every item
+            is labeled <b>SIMULATED</b>. There is no real cluster behind this console.
           </MessageBarBody>
         </MessageBar>
         <div className={styles.toggleRow}>
           <Switch
             checked={on}
             onChange={(_, d) => setOn(d.checked)}
-            label={on ? "Stream running (SIMULATED)" : "Stream paused"}
+            label={on ? "Stream running (simulated)" : "Stream paused"}
           />
         </div>
       </div>
       <div className={styles.list}>
         {items.map((it) => (
-          <div key={it.id} className={styles.item}>
+          <div key={it.id} className={`${styles.item} sentinel-stream-item`}>
             <Badge appearance="tint" color="warning">
               SIMULATED
             </Badge>
             <span className={styles.text}>{it.text}</span>
             <span className={styles.caption}>{it.at}</span>
             <Button appearance="subtle" size="small" onClick={() => onTriageText(it.text)}>
-              Triage this alert
+              Diagnose this alert
             </Button>
           </div>
         ))}
         {items.length === 0 && (
           <span className={styles.caption}>
-            {on ? "Waiting for the first sample alert…" : "Flip the switch to start the simulated stream."}
+            {on ? "Waiting for the first sample alert\u2026" : "Turn the switch on to start the sample stream."}
           </span>
         )}
       </div>
