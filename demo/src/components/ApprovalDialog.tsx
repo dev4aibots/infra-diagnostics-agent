@@ -67,9 +67,9 @@ const useStyles = makeStyles({
 });
 
 const ACTION_META: Record<DecisionAction, { label: string; confirm: string; badge: "success" | "warning" | "danger" }> = {
-  approve: { label: "Approve", confirm: "Approve remediation", badge: "success" },
+  approve: { label: "Approve", confirm: "Approve fix", badge: "success" },
   escalate: { label: "Escalate", confirm: "Escalate to on-call", badge: "warning" },
-  ignore: { label: "Ignore", confirm: "Ignore incident", badge: "danger" },
+  ignore: { label: "Dismiss", confirm: "Dismiss incident", badge: "danger" },
 };
 
 export type PendingDecision = {
@@ -111,20 +111,20 @@ export function ApprovalDialog({
                   <span className={styles.caption}>Incident {pending.incidentId}</span>
                 </div>
                 <MessageBar intent="warning">
-                  <MessageBarTitle>SIMULATED — dry run only</MessageBarTitle>
+                  <MessageBarTitle>Simulated: dry run only</MessageBarTitle>
                   <MessageBarBody>
-                    No cluster is connected and nothing will execute. This dialog shows the exact
-                    remediation plan that would run after verified human approval.
+                    Nothing is connected and nothing will run. This shows the exact fix that
+                    would run after your approval.
                   </MessageBarBody>
                 </MessageBar>
                 <div>
-                  <div className={styles.sectionLabel}>Remediation plan (dry-run)</div>
+                  <div className={styles.sectionLabel}>Proposed fix (nothing runs yet)</div>
                   <div className={styles.plan} style={{ fontFamily: theme.fontFamilyMonospace }}>
                     {pending.hypothesis.remediation}
                   </div>
                 </div>
                 <div>
-                  <div className={styles.sectionLabel}>Supporting evidence</div>
+                  <div className={styles.sectionLabel}>Why the agent suggests this</div>
                   <ul className={styles.evidence}>
                     {pending.hypothesis.evidence.map((e, i) => (
                       <li key={i}>{e}</li>
