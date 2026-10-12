@@ -38,8 +38,8 @@ type TabId = "triage" | "approvals" | "security" | "outbound" | "stream";
 const TABS: { id: TabId; label: string; icon: React.ReactElement }[] = [
   { id: "triage", label: "Triage console", icon: <AlertUrgentRegular /> },
   { id: "approvals", label: "Approval gate", icon: <CheckmarkCircleRegular /> },
-  { id: "security", label: "Signature playground", icon: <KeyRegular /> },
-  { id: "outbound", label: "Outbound log", icon: <SendRegular /> },
+  { id: "security", label: "Request security", icon: <KeyRegular /> },
+  { id: "outbound", label: "Sent messages", icon: <SendRegular /> },
   { id: "stream", label: "Alert stream", icon: <PlayRegular /> },
 ];
 
