@@ -47,6 +47,9 @@ const useStyles = makeStyles({
   shell: {
     display: "flex",
     minHeight: "100vh",
+    "@media (max-width: 768px)": {
+      flexDirection: "column",
+    },
   },
   nav: {
     flex: "0 0 18%",
@@ -58,6 +61,15 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: tokens.spacingVerticalS,
+    "@media (max-width: 768px)": {
+      flex: "none",
+      flexDirection: "row",
+      flexWrap: "wrap",
+      borderRightWidth: 0,
+      borderBottomWidth: tokens.strokeWidthThin,
+      borderBottomStyle: "solid",
+      borderBottomColor: tokens.colorNeutralStroke1,
+    },
   },
   navLabel: {
     fontSize: tokens.fontSizeBase200,
@@ -67,6 +79,9 @@ const useStyles = makeStyles({
     paddingLeft: tokens.spacingHorizontalM,
     paddingRight: tokens.spacingHorizontalM,
     marginBottom: tokens.spacingVerticalS,
+    "@media (max-width: 768px)": {
+      display: "none",
+    },
   },
   main: {
     flexGrow: 1,
@@ -109,6 +124,7 @@ export default function ConsolePage() {
 
   const requestDecision = React.useCallback(
     (hypothesis: Hypothesis, incidentId: string, action: DecisionAction) => {
+      if (action === "approve" && hypothesis.remediation === "no remediation proposed") return;
       setPending({ hypothesis, incidentId, action });
     },
     [],

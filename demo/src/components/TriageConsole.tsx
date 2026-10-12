@@ -15,6 +15,7 @@ import {
   Skeleton,
   SkeletonItem,
   Spinner,
+  Tooltip,
   makeStyles,
   tokens
 
@@ -117,6 +118,7 @@ function HypothesisCard({
 }) {
   const styles = useStyles();
   const { theme } = React.useContext(ThemeContext);
+  const approveDisabled = hypothesis.remediation === "no remediation proposed";
   return (
     <Card>
       <CardHeader
@@ -155,9 +157,24 @@ function HypothesisCard({
       </div>
       <CardFooter>
         <div className={styles.footer}>
-          <Button appearance="primary" onClick={() => onRequestDecision(hypothesis, incidentId, "approve")}>
-            Approve
-          </Button>
+          <Tooltip
+            content={
+              approveDisabled
+                ? "No remediation proposed — there is nothing to approve for this hypothesis."
+                : "Approve this remediation"
+            }
+            relationship="label"
+          >
+            <span style={{ display: "inline-block" }}>
+              <Button
+                appearance="primary"
+                disabled={approveDisabled}
+                onClick={() => onRequestDecision(hypothesis, incidentId, "approve")}
+              >
+                Approve
+              </Button>
+            </span>
+          </Tooltip>
           <Button appearance="secondary" onClick={() => onRequestDecision(hypothesis, incidentId, "escalate")}>
             Escalate
           </Button>
