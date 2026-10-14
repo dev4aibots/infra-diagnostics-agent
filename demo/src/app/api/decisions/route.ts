@@ -3,9 +3,9 @@ import { handleSlackInteractivity } from "@/logic/handlers";
 import { signForTesting } from "@/logic/slack_verify";
 import { DEMO_SIGNING_SECRET, outboundLog } from "@/lib/outbound";
 
-const ACTIONS = new Set(["approve", "escalate", "ignore"]);
+const ACTIONS = new Set(["approve", "escalate", "dismiss"]);
 
-// POST /api/decisions  { action: "approve" | "escalate" | "ignore", incidentId: string }
+// POST /api/decisions  { action: "approve" | "escalate" | "dismiss", incidentId: string }
 // Replicates the Slack interactivity flow: builds the exact payload shape the
 // source validates, self-signs it, and runs it through handleSlackInteractivity.
 // The handler appends { url, body: { text } } to the outbound log — the same

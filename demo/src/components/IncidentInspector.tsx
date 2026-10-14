@@ -173,7 +173,7 @@ export function IncidentInspector({
         <Button appearance="secondary" onClick={() => onRequestDecision(hypothesis, incidentId, "escalate")}>
           Escalate
         </Button>
-        <Button appearance="subtle" onClick={() => onRequestDecision(hypothesis, incidentId, "ignore")}>
+        <Button appearance="subtle" onClick={() => onRequestDecision(hypothesis, incidentId, "dismiss")}>
           Dismiss
         </Button>
       </div>

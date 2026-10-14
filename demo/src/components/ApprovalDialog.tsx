@@ -69,7 +69,7 @@ const useStyles = makeStyles({
 const ACTION_META: Record<DecisionAction, { label: string; confirm: string; badge: "success" | "warning" | "danger" }> = {
   approve: { label: "Approve", confirm: "Approve fix", badge: "success" },
   escalate: { label: "Escalate", confirm: "Escalate to on-call", badge: "warning" },
-  ignore: { label: "Dismiss", confirm: "Dismiss incident", badge: "danger" },
+  dismiss: { label: "Dismiss", confirm: "Dismiss incident", badge: "danger" },
 };
 
 export type PendingDecision = {
@@ -140,7 +140,7 @@ export function ApprovalDialog({
             </Button>
             <Button
               appearance="primary"
-              className={pending?.action === "ignore" ? styles.dangerConfirm : undefined}
+              className={pending?.action === "dismiss" ? styles.dangerConfirm : undefined}
               onClick={() => pending && onConfirm(pending)}
             >
               {meta?.confirm ?? "Confirm"}

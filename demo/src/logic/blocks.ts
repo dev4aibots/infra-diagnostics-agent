@@ -40,9 +40,9 @@ export function buildSlackResponse(report: AgentReport): SlackResponse {
       },
       {
         type: "button",
-        text: { type: "plain_text", text: "Ignore" },
+        text: { type: "plain_text", text: "Dismiss" },
         style: "danger",
-        action_id: "ignore",
+        action_id: "dismiss",
         value: report.incidentId,
       },
     ],
@@ -57,7 +57,7 @@ export function actionReply(actionId: string, incidentId: string): SlackResponse
   } else if (actionId === "escalate") {
     text = `Escalated ${incidentId} to on-call.`;
   } else {
-    text = `Ignored ${incidentId}.`;
+    text = `Dismissed ${incidentId}.`;
   }
   return { response_type: "in_channel", replace_original: false, text };
 }

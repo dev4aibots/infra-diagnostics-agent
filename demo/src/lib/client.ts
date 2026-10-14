@@ -8,7 +8,7 @@ export type TriageResult = {
   report: AgentReport;
 };
 
-export type DecisionAction = "approve" | "escalate" | "ignore";
+export type DecisionAction = "approve" | "escalate" | "dismiss";
 
 export type DecisionResult = {
   status: number;

@@ -303,7 +303,7 @@ export function TriageConsole({
                     #{h.rank}
                   </Badge>
                   <span className={styles.feedSummary}>{h.summary}</span>
-                  <span className={styles.feedMeta}>{h.evidence.length} pieces of evidence</span>
+                  <span className={styles.feedMeta}>{h.evidence.length} piece{h.evidence.length === 1 ? "" : "s"} of evidence</span>
                 </button>
               ))}
             </div>

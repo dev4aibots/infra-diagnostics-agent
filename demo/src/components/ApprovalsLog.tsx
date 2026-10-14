@@ -48,7 +48,7 @@ const useStyles = makeStyles({
 const ACTION_BADGE: Record<DecisionAction, "success" | "warning" | "danger"> = {
   approve: "success",
   escalate: "warning",
-  ignore: "danger",
+  dismiss: "danger",
 };
 
 export function ApprovalsLog({ decisions }: { decisions: DecisionRecord[] }) {

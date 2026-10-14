@@ -97,7 +97,7 @@ const useStyles = makeStyles({
 const TOAST_INTENT: Record<DecisionAction, "success" | "warning" | "info"> = {
   approve: "success",
   escalate: "warning",
-  ignore: "info",
+  dismiss: "info",
 };
 
 export default function ConsolePage() {
@@ -132,6 +132,9 @@ export default function ConsolePage() {
 
   const confirmDecision = React.useCallback(
     async (p: PendingDecision) => {
+      // Close the dialog synchronously with the click: the record + toast land
+      // below, so no second dialog can linger or re-appear during the round-trip.
+      setPending(null);
       const res = await recordDecision(p.action, p.incidentId);
       const replyText = res.body.text ?? "(no reply text)";
       setDecisions((prev) => [
@@ -145,7 +148,6 @@ export default function ConsolePage() {
         },
         ...prev,
       ]);
-      setPending(null);
       dispatchToast(
         <Toast>
           <ToastTitle>Decision recorded — {p.action}</ToastTitle>
