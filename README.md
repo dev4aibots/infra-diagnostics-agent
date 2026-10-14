@@ -1,6 +1,6 @@
 # Infra Diagnostics Agent
 
-🚀 **Live demo:** https://infra-diagnostics-agent-demo-id052c39b-dev4aibots.vercel.app
+🚀 **Live demo:** https://infra-diagnostics-agent-demo.vercel.app
 
 
 > 🧪 **Learning build** — a course/tutorial project for studying DevOps diagnostic agents. Not a production system.
