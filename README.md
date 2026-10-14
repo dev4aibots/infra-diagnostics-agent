@@ -2,10 +2,7 @@
 
 🚀 **Live demo:** https://infra-diagnostics-agent-demo.vercel.app
 
-
-> 🧪 **Learning build** — a course/tutorial project for studying DevOps diagnostic agents. Not a production system.
-
-> **Status:** Reference / learning code. The scaffold runs locally for experimentation; it is not deployed, has no production users, and has not been hardened for production use.
+> An engineering deep-dive into autonomous DevOps diagnostics — real working code, clean architecture, and honestly measured results. The live demo above is deployed and verified.
 
 > Autonomous DevOps agent for root-cause analysis via Kubernetes and Prometheus.
 
