@@ -91,6 +91,39 @@ export function ApprovalDialog({
   const { theme } = React.useContext(ThemeContext);
   const meta = pending ? ACTION_META[pending.action] : null;
 
+  // Focus return: this dialog is opened via state (not a Fluent
+  // DialogTrigger), so Fluent has no trigger element to restore focus
+  // to and focus falls back to <body> on close. Track the last element
+  // focused outside the dialog while it is closed (the invoking
+  // Approve / Escalate / Dismiss button) and return focus to it when
+  // the dialog closes — via Cancel, Escape, backdrop, or Confirm.
+  const lastTriggerRef = React.useRef<HTMLElement | null>(null);
+  const wasOpenRef = React.useRef(false);
+  React.useEffect(() => {
+    if (pending) {
+      wasOpenRef.current = true;
+      return;
+    }
+    const onFocusIn = (e: FocusEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && typeof t.closest === "function" && !t.closest('[role="dialog"]')) {
+        lastTriggerRef.current = t;
+      }
+    };
+    document.addEventListener("focusin", onFocusIn);
+    if (wasOpenRef.current) {
+      wasOpenRef.current = false;
+      const el = lastTriggerRef.current;
+      if (el && el.isConnected) {
+        // Defer past Fluent's own close handling so the restore wins.
+        requestAnimationFrame(() => {
+          if (el.isConnected) el.focus();
+        });
+      }
+    }
+    return () => document.removeEventListener("focusin", onFocusIn);
+  }, [pending]);
+
   return (
     <Dialog
       open={pending !== null}
