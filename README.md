@@ -1,6 +1,6 @@
 # Infra Diagnostics Agent
 
-🚀 **Live demo:** https://infra-diagnostics-agent-demo.vercel.app
+**Live demo:** https://infra-diagnostics-agent-demo.vercel.app
 
 > An engineering deep-dive into autonomous DevOps diagnostics — real working code, clean architecture, and honestly measured results. The live demo above is deployed and verified.
 
@@ -8,7 +8,7 @@
 
 ![Demo](demo.gif)
 
-[Demo](demo.gif) | [Architecture](docs/architecture.md) | [API Docs](#) | [Evaluation](#evaluation--performance)
+[Demo](demo.gif) | [Architecture](docs/architecture.md) | [Security](docs/security.md) | [Evaluation](#evaluation--performance)
 
 ## What it does
 An autonomous agent that investigates Kubernetes infrastructure alerts, queries metrics, and formulates a root-cause hypothesis before human intervention.
