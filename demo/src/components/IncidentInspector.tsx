@@ -15,6 +15,7 @@ import {
 } from "@fluentui/react-components";
 import type { Hypothesis } from "@/logic/types";
 import type { DecisionAction } from "@/lib/client";
+import { isNoRemediation } from "@/lib/localLog";
 
 // Inspector side panel: the full breakdown of the selected likely cause.
 // Lives next to the ranked feed; everything here is a read of the report,
@@ -123,7 +124,8 @@ export function IncidentInspector({
     );
   }
 
-  const approveDisabled = hypothesis.remediation === "no remediation proposed";
+  // QA defect D9: with no remediation proposed there is no fix to approve.
+  const approveDisabled = isNoRemediation(hypothesis.remediation);
 
   return (
     <aside className={styles.panel} aria-label="Incident inspector">
@@ -164,6 +166,7 @@ export function IncidentInspector({
             <Button
               appearance="primary"
               disabled={approveDisabled}
+              aria-disabled={approveDisabled}
               onClick={() => onRequestDecision(hypothesis, incidentId, "approve")}
             >
               Approve fix
@@ -177,9 +180,16 @@ export function IncidentInspector({
           Dismiss
         </Button>
       </div>
-      <span className={styles.caption}>
-        Approving opens a confirmation first. Nothing runs without your say-so.
-      </span>
+      {approveDisabled ? (
+        <span className={styles.caption}>
+          No fix proposed for this cause, so Approve fix is disabled — Escalate or
+          Dismiss instead.
+        </span>
+      ) : (
+        <span className={styles.caption}>
+          Approving opens a confirmation first. Nothing runs without your say-so.
+        </span>
+      )}
     </aside>
   );
 }

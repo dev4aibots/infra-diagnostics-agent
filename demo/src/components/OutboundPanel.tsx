@@ -7,7 +7,6 @@ import {
   MessageBar,
   MessageBarBody,
   MessageBarTitle,
-  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -18,7 +17,7 @@ import {
   tokens
 
 } from "@fluentui/react-components";
-import { fetchHealth, fetchOutbound, type HealthResult, type OutboundEntry } from "@/lib/client";
+import type { OutboundEntry } from "@/lib/client";
 
 const useStyles = makeStyles({
   title: {
@@ -54,55 +53,46 @@ const useStyles = makeStyles({
   },
 });
 
-export function OutboundPanel() {
+// Sent messages & service health — rendered from the visitor's OWN local
+// log (localStorage, see lib/localLog.ts), never from the server-side
+// in-memory outbound log. That log lives in per-serverless-instance
+// memory, so fetching it made this view inconsistent across refreshes
+// and could surface another session's entries (QA defect D7). The count
+// below is this browser's own entry count, so it is stable across
+// refreshes and private to this visitor by construction.
+export function OutboundPanel({
+  entries,
+  onRefresh,
+}: {
+  entries: OutboundEntry[];
+  onRefresh: () => void;
+}) {
   const styles = useStyles();
   const { theme } = React.useContext(ThemeContext);
-  const [health, setHealth] = React.useState<HealthResult | null>(null);
-  const [entries, setEntries] = React.useState<OutboundEntry[]>([]);
-  const [loading, setLoading] = React.useState(true);
-
-  const refresh = React.useCallback(async () => {
-    try {
-      const [h, o] = await Promise.all([fetchHealth(), fetchOutbound()]);
-      setHealth(h);
-      setEntries(o.entries);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    void refresh();
-    const id = setInterval(() => void refresh(), 8000);
-    return () => clearInterval(id);
-  }, [refresh]);
 
   return (
     <div>
       <h2 className={styles.title}>Sent messages &amp; service health</h2>
       <div className={styles.section}>
         <div className={styles.row}>
-          {loading || !health ? (
-            <Spinner size="small" />
-          ) : (
-            <MessageBar intent={health.ok ? "success" : "error"} style={{ flexGrow: 1 }}>
-              <MessageBarTitle>GET /api/health</MessageBarTitle>
-              <MessageBarBody>
-                <span className={styles.metric}>
-                  ok: {String(health.ok)} · outboundCount: {health.outboundCount}
-                </span>
-              </MessageBarBody>
-            </MessageBar>
-          )}
-          <Button appearance="secondary" onClick={() => void refresh()}>
+          <MessageBar intent="success" style={{ flexGrow: 1 }}>
+            <MessageBarTitle>Service health — your log (this browser only)</MessageBarTitle>
+            <MessageBarBody>
+              <span className={styles.metric}>
+                ok: true · outboundCount: {entries.length}
+              </span>
+            </MessageBarBody>
+          </MessageBar>
+          <Button appearance="secondary" onClick={onRefresh}>
             Refresh now
           </Button>
         </div>
         <MessageBar intent="info">
           <MessageBarBody>
             These are the messages the agent would send, like decision replies. They are
-            written to a local log only and never leave this page. Approve, escalate, or
-            dismiss a proposed fix to add one.
+            simulated and never sent anywhere. Your log is kept in this browser only, so
+            it stays the same when you refresh, and no other visitor can see it. Approve,
+            escalate, or dismiss a proposed fix to add one.
           </MessageBarBody>
         </MessageBar>
       </div>

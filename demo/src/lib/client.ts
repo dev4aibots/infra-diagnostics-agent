@@ -49,7 +49,13 @@ async function postJson<T>(path: string, payload: unknown): Promise<{ httpStatus
 }
 
 export async function triageAlert(text: string): Promise<TriageResult> {
-  const { json } = await postJson<TriageResult>("/api/alerts/triage", { text });
+  const { httpStatus, json } = await postJson<TriageResult>("/api/alerts/triage", { text });
+  // A network failure already rejects out of fetch(); an HTTP error status
+  // must also surface as a failure so the UI can show an inline error
+  // instead of silently reverting (QA defect D8).
+  if (httpStatus < 200 || httpStatus >= 300) {
+    throw new Error(`triage request failed with HTTP ${httpStatus}`);
+  }
   return json;
 }
 

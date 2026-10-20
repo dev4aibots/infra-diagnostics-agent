@@ -184,6 +184,7 @@ export function TriageConsole({
   const styles = useStyles();
   const [input, setInput] = React.useState("");
   const [loading, setLoading] = React.useState(false);
+  const [triageError, setTriageError] = React.useState<string | null>(null);
   const [lastReply, setLastReply] = React.useState<string | null>(null);
   const [alertTexts, setAlertTexts] = React.useState<Record<string, string>>({});
   const [selectedRank, setSelectedRank] = React.useState<number>(1);
@@ -192,11 +193,16 @@ export function TriageConsole({
     const t = text.trim();
     if (!t || loading) return;
     setLoading(true);
+    setTriageError(null);
     try {
       const res = await onSubmit(t);
       setLastReply(res.slack.body.text ?? null);
       setAlertTexts((prev) => ({ ...prev, [res.report.incidentId]: t }));
       setSelectedRank(1);
+    } catch {
+      // QA defect D8: a failed triage fetch used to revert silently to the
+      // empty state. Surface an inline error the visitor can act on.
+      setTriageError("Diagnosis failed — try again.");
     } finally {
       setLoading(false);
     }
@@ -252,6 +258,15 @@ export function TriageConsole({
         {lastReply && (
           <span className={styles.caption}>The agent would reply in Slack: &ldquo;{lastReply}&rdquo;</span>
         )}
+        {triageError && (
+          <MessageBar intent="error" role="alert">
+            <MessageBarTitle>Diagnosis failed — try again</MessageBarTitle>
+            <MessageBarBody>
+              {triageError} The alert could not be diagnosed — check your connection and
+              press &ldquo;Diagnose alert&rdquo; again.
+            </MessageBarBody>
+          </MessageBar>
+        )}
       </div>
 
       <div className={styles.section}>
@@ -273,7 +288,7 @@ export function TriageConsole({
             </Skeleton>
           </div>
         )}
-        {!loading && !latest && (
+        {!loading && !latest && !triageError && (
           <MessageBar intent="info">
             <MessageBarTitle>No alerts checked yet</MessageBarTitle>
             <MessageBarBody>

@@ -29,8 +29,17 @@ import {
   triageAlert,
   type DecisionAction,
   type DecisionRecord,
+  type OutboundEntry,
   type TriageResult,
 } from "@/lib/client";
+import {
+  OUTBOUND_URL,
+  isNoRemediation,
+  loadDecisions,
+  loadOutbound,
+  saveDecisions,
+  saveOutbound,
+} from "@/lib/localLog";
 import type { AgentReport, Hypothesis } from "@/logic/types";
 
 type TabId = "triage" | "approvals" | "security" | "outbound" | "stream";
@@ -106,7 +115,23 @@ export default function ConsolePage() {
   const [tab, setTab] = React.useState<TabId>("triage");
   const [reports, setReports] = React.useState<AgentReport[]>([]);
   const [decisions, setDecisions] = React.useState<DecisionRecord[]>([]);
+  const [outboundEntries, setOutboundEntries] = React.useState<OutboundEntry[]>([]);
   const [pending, setPending] = React.useState<PendingDecision | null>(null);
+
+  // Per-visitor log (QA defect D7): decisions and their outbound entries
+  // live in this visitor's browser (localStorage), not in the API routes'
+  // per-instance in-memory log. Hydrate once on mount so the Approval
+  // gate and Sent messages survive refreshes and can never show another
+  // visitor's entries.
+  React.useEffect(() => {
+    setDecisions(loadDecisions());
+    setOutboundEntries(loadOutbound());
+  }, []);
+
+  const refreshLocalLog = React.useCallback(() => {
+    setDecisions(loadDecisions());
+    setOutboundEntries(loadOutbound());
+  }, []);
 
   const runTriage = React.useCallback(async (text: string): Promise<TriageResult> => {
     const res = await triageAlert(text);
@@ -116,7 +141,12 @@ export default function ConsolePage() {
 
   const handleStreamTriage = React.useCallback(
     async (text: string) => {
-      await runTriage(text);
+      try {
+        await runTriage(text);
+      } catch {
+        // A failed stream-triggered triage must not become an unhandled
+        // rejection; the visitor still lands on the triage console.
+      }
       setTab("triage");
     },
     [runTriage],
@@ -124,7 +154,7 @@ export default function ConsolePage() {
 
   const requestDecision = React.useCallback(
     (hypothesis: Hypothesis, incidentId: string, action: DecisionAction) => {
-      if (action === "approve" && hypothesis.remediation === "no remediation proposed") return;
+      if (action === "approve" && isNoRemediation(hypothesis.remediation)) return;
       setPending({ hypothesis, incidentId, action });
     },
     [],
@@ -137,17 +167,24 @@ export default function ConsolePage() {
       setPending(null);
       const res = await recordDecision(p.action, p.incidentId);
       const replyText = res.body.text ?? "(no reply text)";
-      setDecisions((prev) => [
-        {
-          id: `${Date.now()}-${p.incidentId}-${p.action}`,
-          at: new Date().toLocaleString(),
-          incidentId: p.incidentId,
-          action: p.action,
-          replyText,
-          remediation: p.hypothesis.remediation,
-        },
-        ...prev,
-      ]);
+      const record: DecisionRecord = {
+        id: `${Date.now()}-${p.incidentId}-${p.action}`,
+        at: new Date().toLocaleString(),
+        incidentId: p.incidentId,
+        action: p.action,
+        replyText,
+        remediation: p.hypothesis.remediation,
+      };
+      // Mirror, in this visitor's browser, the outbound entry the server
+      // handler recorded for this decision ({ url, body: { text } }) and
+      // persist both logs so they are stable across refreshes (D7).
+      const entry: OutboundEntry = { url: OUTBOUND_URL, body: { text: replyText } };
+      const nextDecisions = [record, ...decisions];
+      const nextOutbound = [entry, ...outboundEntries];
+      setDecisions(nextDecisions);
+      setOutboundEntries(nextOutbound);
+      saveDecisions(nextDecisions);
+      saveOutbound(nextOutbound);
       dispatchToast(
         <Toast>
           <ToastTitle>Decision recorded — {p.action}</ToastTitle>
@@ -156,7 +193,7 @@ export default function ConsolePage() {
         { intent: TOAST_INTENT[p.action] },
       );
     },
-    [dispatchToast],
+    [dispatchToast, decisions, outboundEntries],
   );
 
   return (
@@ -184,7 +221,9 @@ export default function ConsolePage() {
             )}
             {tab === "approvals" && <ApprovalsLog decisions={decisions} />}
             {tab === "security" && <SecurityPlayground />}
-            {tab === "outbound" && <OutboundPanel />}
+            {tab === "outbound" && (
+              <OutboundPanel entries={outboundEntries} onRefresh={refreshLocalLog} />
+            )}
             {tab === "stream" && <AlertStream onTriageText={handleStreamTriage} />}
           </div>
         </main>
