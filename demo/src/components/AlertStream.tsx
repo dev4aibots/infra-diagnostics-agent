@@ -128,7 +128,7 @@ export function AlertStream({ onTriageText }: { onTriageText: (text: string) => 
       </div>
       <div className={styles.list}>
         {items.map((it) => (
-          <div key={it.id} className={`${styles.item} sentinel-stream-item`}>
+          <div key={it.id} className={`${styles.item} sentinel-stream-item du-sev-rail`} data-du-sev="warning">
             <Badge appearance="tint" color="warning">
               SIMULATED
             </Badge>

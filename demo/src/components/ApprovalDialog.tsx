@@ -98,7 +98,7 @@ export function ApprovalDialog({
         if (!d.open) onClose();
       }}
     >
-      <DialogSurface>
+      <DialogSurface className="du-dialog-pop">
         <DialogBody>
           <DialogTitle>Confirm decision</DialogTitle>
           <DialogContent className={styles.content}>

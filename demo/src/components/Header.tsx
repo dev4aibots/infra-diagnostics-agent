@@ -90,7 +90,7 @@ export function Header() {
   const styles = useStyles();
   const { dark, toggle } = React.useContext(ThemeContext);
   return (
-    <header className={styles.bar}>
+    <header className={mergeClasses(styles.bar, "du-brand-beam")}>
       <div className={styles.brand}>
         <span className={styles.icon} aria-hidden="true">
           <ShieldCheckmarkRegular />

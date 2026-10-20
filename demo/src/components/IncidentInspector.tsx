@@ -112,7 +112,7 @@ export function IncidentInspector({
 
   if (!incidentId || !hypothesis) {
     return (
-      <aside className={styles.panel} aria-label="Incident inspector">
+      <aside className={`${styles.panel} du-inspector-frame`} aria-label="Incident inspector">
         <h3 className={styles.heading}>Inspector</h3>
         <MessageBar intent="info">
           <MessageBarBody>
@@ -128,7 +128,7 @@ export function IncidentInspector({
   const approveDisabled = isNoRemediation(hypothesis.remediation);
 
   return (
-    <aside className={styles.panel} aria-label="Incident inspector">
+    <aside className={`${styles.panel} du-inspector-frame`} aria-label="Incident inspector">
       <div>
         <h3 className={styles.heading}>Incident {incidentId}</h3>
         {alertText && <div className={styles.caption}>Alert: {alertText}</div>}

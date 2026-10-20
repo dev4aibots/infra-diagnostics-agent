@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Providers } from "./providers";
+import "./design-overlay.css";
 
 export const metadata: Metadata = {
   title: "Sentinel — infra diagnostics console",
