@@ -81,3 +81,8 @@ npm run dev
 
 ## Roadmap
 - Integrate Datadog metrics API.
+## Proof & Evidence
+
+- **Live triage console** with approval gate: human approves before any action
+- **Agent behavior:** ranks likely causes with evidence, proposes fixes; simulated on-call environment (no real cluster touched — labeled)
+- **Honest boundary:** UI + agent loop are real; cluster access is simulated by design
